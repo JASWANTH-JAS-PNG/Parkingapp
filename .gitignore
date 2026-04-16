@@ -1,0 +1,30 @@
+# Backend
+backend/ParkingAPI/bin/
+backend/ParkingAPI/obj/
+backend/ParkingAPI/.vs/
+backend/ParkingAPI/logs/
+backend/ParkingAPI/*.db
+backend/ParkingAPI/*.db-shm
+backend/ParkingAPI/*.db-wal
+
+# Frontend
+my-app/node_modules/
+my-app/build/
+my-app/.env
+my-app/.env.local
+
+# IDE
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+.env
+.env.local

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet tool:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(find \"c:/Users/pedda/Desktop/New folder \\(2\\)/backend\" -name \"*.cs\" -exec grep -l \"public class User\" {} \\\\;)"
+    ]
+  }
+}
