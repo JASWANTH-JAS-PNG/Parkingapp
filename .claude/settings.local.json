@@ -3,7 +3,9 @@
     "allow": [
       "Bash(dotnet tool:*)",
       "Bash(dotnet clean:*)",
-      "Bash(find \"c:/Users/pedda/Desktop/New folder \\(2\\)/backend\" -name \"*.cs\" -exec grep -l \"public class User\" {} \\\\;)"
+      "Bash(find \"c:/Users/pedda/Desktop/New folder \\(2\\)/backend\" -name \"*.cs\" -exec grep -l \"public class User\" {} \\\\;)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\pedda\\\\Parkingapp\" -Recurse -Force)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

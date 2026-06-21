@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ParkingLot.Data;
 using ParkingLot.Models;
 using productAPI.DTOs;
-using productAPI.Services;
+using ParkingAPI.Interfaces;
 using BCrypt.Net;
 
 namespace productAPI.Controllers;
@@ -41,7 +41,7 @@ public class AccountController : ControllerBase
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { token = _tokenService.createToken(user) });
+            return Ok(new { token = _tokenService.CreateToken(user) });
         }
         catch (Exception ex)
         {
@@ -60,7 +60,7 @@ public class AccountController : ControllerBase
                 return Unauthorized("Invalid username or password");
             }
 
-            return Ok(new { token = _tokenService.createToken(user) });
+            return Ok(new { token = _tokenService.CreateToken(user) });
         }
         catch (Exception ex)
         {

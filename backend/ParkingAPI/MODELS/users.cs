@@ -1,12 +1,14 @@
-using Microsoft.AspNetCore.Identity;
-
 namespace ParkingLot.Models
 {
-    public class User : IdentityUser
+    public class User
     {
-        public override string? UserName { get; set; }
+        public int Id { get; set; }
 
-        public override string? Email { get; set; }
+        public string UserName { get; set; } = string.Empty;
+
+        public string PasswordHash { get; set; } = string.Empty;
+
+        public string? Email { get; set; }
 
         public string? Name { get; set; }
 
