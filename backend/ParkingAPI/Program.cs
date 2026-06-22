@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using ParkingLot.Data;
 using Serilog;
 using ParkingAPI.Interfaces;
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IBookingsRepository, BookingsRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -48,5 +50,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseCors("AllowFrontend");
+app.MapOpenApi();
+app.MapScalarApiReference();
 app.MapControllers();
 app.Run();
