@@ -12,7 +12,7 @@ import axios from 'axios'
 
 const SESSION_KEY = 'pw_token'
 
-const api = axios.create({ baseURL: '/api' })
+const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE ?? '/api' })
 
 api.interceptors.request.use(cfg => {
   const token = sessionStorage.getItem(SESSION_KEY)

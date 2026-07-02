@@ -1,49 +1,68 @@
-# ParkWave — Parking Management App
+# ParkWave
 
-A full-stack parking management system with real-time slot booking.
+A full-stack parking management web app — browse lots, book slots, and manage reservations in real time.
 
-**Stack:** React 18 + Vite (frontend) · ASP.NET Core 10 / EF Core 8 (backend) · SQL Server LocalDB
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=flat-square)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white&style=flat-square)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white&style=flat-square)
+![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white&style=flat-square)
+![EF Core](https://img.shields.io/badge/EF_Core-8-512BD4?logo=dotnet&logoColor=white&style=flat-square)
+![SQL Server](https://img.shields.io/badge/SQL_Server-LocalDB-CC2927?logo=microsoftsqlserver&logoColor=white&style=flat-square)
 
 ---
 
-## Quick Start
+## Features
 
-### 1 — Prerequisites
+- **JWT authentication** — register, login, session stored in `sessionStorage`
+- **Parking lot browser** — paginated list with sort by name / location
+- **Slot grid** — visual availability map per lot, click to book
+- **Bookings dashboard** — view and manage your reservations
+- **Profile page** — account details at a glance
+- **Animated UI** — Framer Motion transitions, particle background, dark theme
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| .NET SDK | 10.0+ | [download](https://dotnet.microsoft.com/download) |
-| Node.js | 18+ | [download](https://nodejs.org) |
-| SQL Server LocalDB | any | ships with Visual Studio / VS Build Tools |
+---
 
-Start LocalDB (one-time):
-```
+## Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | React 19, React Router v7, Vite 8 |
+| Styling | Tailwind CSS v4, Headless UI, Framer Motion |
+| Icons / UX | Lucide React, React Hot Toast, Recharts |
+| HTTP | Axios (with JWT interceptor + 401 redirect) |
+| Backend | ASP.NET Core 10, EF Core 8 |
+| Auth | JWT (System.IdentityModel.Tokens.Jwt) |
+| ORM | Entity Framework Core + Repository pattern |
+| Logging | Serilog (console + rolling file) |
+| Database | SQL Server LocalDB (dev) · PostgreSQL (prod) |
+
+---
+
+## Local Development
+
+### Prerequisites
+
+| Tool | Version |
+|---|---|
+| .NET SDK | 10.0+ |
+| Node.js | 18+ |
+| SQL Server LocalDB | any (ships with Visual Studio / Build Tools) |
+
+### 1 — Start LocalDB
+
+```bash
 sqllocaldb start MSSQLLocalDB
 ```
-
----
 
 ### 2 — Backend
 
 ```bash
 cd backend/ParkingAPI
 dotnet run
+# → http://localhost:5186
 ```
 
-Runs on **http://localhost:5186**  
-Database migrations apply automatically on first start.
-
-> **Tip — disk space:** if your C: drive is low, redirect build temp files:
-> ```powershell
-> $env:TEMP = "D:\tmp"; $env:TMP = "D:\tmp"
-> $env:NUGET_PACKAGES = "D:\nuget-packages"
-> dotnet build -o "D:\ParkingAPI-out"
-> # then run the exe directly:
-> $env:ASPNETCORE_URLS = "http://localhost:5186"
-> D:\ParkingAPI-out\ParkingAPI.exe
-> ```
-
----
+EF migrations run automatically on first start and create the database.
 
 ### 3 — Frontend
 
@@ -51,67 +70,32 @@ Database migrations apply automatically on first start.
 cd frontend
 npm install
 npm run dev
+# → http://localhost:5173
 ```
 
-Runs on **http://localhost:5173**
-
-The Vite dev server proxies all `/api/*` calls to `http://localhost:5186` automatically — no CORS setup needed during development.
+The Vite dev server proxies `/api/*` to `http://localhost:5186` — no CORS config needed.
 
 ---
 
-## App Routes
+## Deployment
 
-| Route | Description | Auth required |
-|-------|-------------|---------------|
-| `/` | Landing page | No |
-| `/register` | Create account | No |
-| `/login` | Sign in | No |
-| `/lots` | Browse parking lots (paginated, sortable) | Yes |
-| `/lots/:id` | Lot detail + slot grid + booking form | Yes |
-| `/bookings` | My bookings (filtered by your account) | Yes |
-| `/profile` | Account info | Yes |
+### Frontend → Vercel
 
----
+1. Import the GitHub repo in [Vercel](https://vercel.com)
+2. Set **Root Directory** to `frontend`
+3. Add environment variable:
+   ```
+   VITE_API_BASE = https://your-backend.railway.app/api
+   ```
+4. Deploy — Vercel auto-rebuilds on every push to `main`
 
-## API Endpoints
+### Backend → Railway
 
-Base URL: `http://localhost:5186/api`
-
-### Auth
-| Method | Path | Body | Response |
-|--------|------|------|----------|
-| POST | `/account/register` | `{ UserName, Password }` | `{ token }` |
-| POST | `/account/login` | `{ UserName, Password }` | `{ token }` |
-
-### Parking Lots
-| Method | Path | Query params |
-|--------|------|-------------|
-| GET | `/parkinglot` | `PageNumber`, `PageSize`, `SortBy` (Name\|Location), `IsDescending` |
-| GET | `/parkinglot/{id}` | — |
-| POST | `/parkinglot` | `{ Id, Name, Location, TotalSlots }` |
-| PUT | `/parkinglot/{id}` | `{ Id, Name, Location, TotalSlots }` |
-| DELETE | `/parkinglot/{id}` | — |
-
-### Parking Slots
-| Method | Path | Notes |
-|--------|------|-------|
-| GET | `/parkingslots` | Returns all slots — filter by `parkingLotId` client-side |
-| GET | `/parkingslots/{id}` | — |
-
-### Bookings
-| Method | Path | Body |
-|--------|------|------|
-| GET | `/bookings` | — (returns all; filter by userId client-side) |
-| GET | `/bookings/{id}` | — |
-| POST | `/bookings` | `{ UserId, ParkingSlotId, StartTime, EndTime }` |
-
----
-
-## JWT Auth
-
-- Token stored in `sessionStorage` (key: `pw_token`)
-- Decoded client-side to extract `userId` (int) and `userName`
-- Include as `Authorization: Bearer <token>` header on all API calls
+1. Create a new project in [Railway](https://railway.app)
+2. **Add service → GitHub repo** → point to `backend/ParkingAPI`
+3. **Add service → PostgreSQL** — Railway injects `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` automatically
+4. The backend detects these env vars and switches from SQL Server to PostgreSQL at startup
+5. Copy the public backend URL and paste it into Vercel's `VITE_API_BASE`
 
 ---
 
@@ -121,42 +105,56 @@ Base URL: `http://localhost:5186/api`
 Parkingapp/
 ├── backend/
 │   └── ParkingAPI/
-│       ├── Controllers/       # AccountController, ParkingLotController,
-│       │                      # ParkingSlotsController, BookingsController
-│       ├── Models/            # User, ParkingLot, ParkingSlot, Booking
-│       ├── Repositories/      # EF Core data access
-│       ├── Services/          # TokenService (JWT)
-│       ├── Data/              # ParkingLotDbContext
-│       ├── DTOs/              # Request/response shapes
-│       ├── Migrations/        # EF Core migrations
-│       └── appsettings.json   # Connection string + JWT key
+│       ├── Controllers/       # Account, ParkingLot, ParkingSlots, Bookings
+│       ├── MODELS/            # User, ParkingLot, ParkingSlot, Booking
+│       ├── Repositories/      # EF Core data access (repository pattern)
+│       ├── Services/          # TokenService (JWT generation)
+│       ├── data/              # ParkingLotDbContext
+│       ├── DTOs/              # Request / response shapes
+│       ├── Migrations/        # EF Core SQL Server migrations
+│       ├── Middleware/        # GlobalExceptionMiddleware
+│       └── Program.cs         # App entry point
 └── frontend/
-    ├── src/
-    │   ├── pages/             # LoginPage, RegisterPage, LotsListPage,
-    │   │                      # LotDetailPage, BookingsPage, ProfilePage
-    │   ├── components/        # Navbar, Particles
-    │   ├── contexts/          # AuthContext (JWT decode + sessionStorage)
-    │   └── api/               # client.js (Axios instance + all API helpers)
-    ├── vite.config.js         # Dev proxy: /api → localhost:5186
-    └── index.html
+    └── src/
+        ├── api/               # client.js — Axios instance + all API helpers
+        ├── contexts/          # AuthContext — JWT decode + sessionStorage
+        ├── components/        # Navbar, Particles
+        └── pages/             # Landing, Login, Register, Lots, LotDetail,
+                               # Bookings, Profile
 ```
 
 ---
 
-## Known Limitations
+## API Reference
 
-- **No server-side slot filter** — `GET /parkingslots` returns all slots; frontend filters by `parkingLotId`
-- **No server-side booking filter** — `GET /bookings` returns all; frontend filters by `userId`  
-- **No `[Authorize]` on controllers** — JWT is validated client-side only; backend trusts the userId in the request body
-- **No double-booking prevention on server** — frontend performs a best-effort overlap check before submitting
+Base URL: `http://localhost:5186/api`
 
----
+### Auth
+| Method | Path | Body |
+|---|---|---|
+| POST | `/account/register` | `{ UserName, Password }` |
+| POST | `/account/login` | `{ UserName, Password }` |
 
-## Deploying the Frontend (Vercel / Netlify)
+Both return `{ token }` — a signed JWT.
 
-1. Deploy the backend to a public host (Azure App Service, Railway, Render, etc.)
-2. Set the `VITE_API_BASE` environment variable to your backend URL
-3. Update `vite.config.js` to use `import.meta.env.VITE_API_BASE` as the proxy target, or configure Axios `baseURL` from the env var
-4. `npm run build` → deploy the `dist/` folder
+### Parking Lots
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/parkinglot` | `?PageNumber&PageSize&SortBy&IsDescending` |
+| GET | `/parkinglot/{id}` | |
+| POST | `/parkinglot` | `{ Id, Name, Location, TotalSlots }` |
+| PUT | `/parkinglot/{id}` | |
+| DELETE | `/parkinglot/{id}` | |
 
-> For a quick local demo, just run both servers locally as described above.
+### Parking Slots
+| Method | Path |
+|---|---|
+| GET | `/parkingslots` |
+| GET | `/parkingslots/{id}` |
+
+### Bookings
+| Method | Path | Body |
+|---|---|---|
+| GET | `/bookings` | |
+| GET | `/bookings/{id}` | |
+| POST | `/bookings` | `{ UserId, ParkingSlotId, StartTime, EndTime }` |
