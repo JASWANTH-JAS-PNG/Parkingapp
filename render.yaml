@@ -1,0 +1,42 @@
+databases:
+  - name: parkwave-db
+    plan: free
+    databaseName: parkwavedb
+    user: parkwave
+
+services:
+  - type: web
+    name: parkwave-api
+    runtime: docker
+    dockerfilePath: ./backend/ParkingAPI/Dockerfile
+    dockerContext: ./backend/ParkingAPI
+    plan: free
+    envVars:
+      - key: PGHOST
+        fromDatabase:
+          name: parkwave-db
+          property: host
+      - key: PGPORT
+        fromDatabase:
+          name: parkwave-db
+          property: port
+      - key: PGDATABASE
+        fromDatabase:
+          name: parkwave-db
+          property: database
+      - key: PGUSER
+        fromDatabase:
+          name: parkwave-db
+          property: user
+      - key: PGPASSWORD
+        fromDatabase:
+          name: parkwave-db
+          property: password
+      - key: JWT__Issuer
+        value: https://parkwave-api.onrender.com
+      - key: JWT__Audience
+        value: https://parkwave-api.onrender.com
+      - key: JWT__Key
+        generateValue: true
+      - key: TokenKey
+        generateValue: true
